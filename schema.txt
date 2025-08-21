@@ -1,0 +1,10 @@
+CREATE TABLE orders (
+        order_id INT PRIMARY KEY,
+        customer_id INT NOT NULL,
+        order_date DATE NOT NULL,
+        total_amount DECIMAL(10,2) NOT NULL,
+        status VARCHAR(20) CHECK (status IN ('Pending','Shipped','Delivered','Cancelled')),
+        payment_method VARCHAR(20) CHECK (payment_method IN ('Card','UPI','COD','NetBanking')),
+        shipping_address TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)
