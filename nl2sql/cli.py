@@ -5,7 +5,8 @@ from rich.console import Console
 from rich.text import Text
 
 from .config import get_config, set_config, flush_config, load_config
-from .llm import OpenAI
+from .llm import OpenAI , req_call
+import pyperclip
 
 console = Console()
 
@@ -53,7 +54,7 @@ def query_type(query_type):
 
 @cli.command()
 @click.argument("nl_query")
-@click.option('--provider', type=click.Choice(['openai', 'lmstudio', 'ollama']), help='The LLM provider to use.')
+@click.option('--provider', type=click.Choice(['openai', 'lmstudio', 'ollama','free']), help='The LLM provider to use.')
 @click.option('--api-key', help='The API key for the LLM provider.')
 @click.option('--model', help='The model to use for conversion.')
 def convert(nl_query, provider, model, api_key):
@@ -68,33 +69,46 @@ def convert(nl_query, provider, model, api_key):
         api_key = api_key or get_config("API_KEY", "")
 
         base_url = None
-        if provider == 'lmstudio':
-            base_url = "http://localhost:1234/v1"
-        elif provider == 'ollama':
-            base_url = "http://localhost:11434/v1"
-
-        llm = OpenAI(api_key=api_key, base_url=base_url, model=model)
-        console.print(f"[bold blue]Using {provider} with model {model} for conversion.[/bold blue]")
-
         start_time = time.time()
-        try:
-            output, usage = llm.nl_to_query(nl_query, schema, query_type)
-            end_time = time.time()
-            elapsed_time = end_time - start_time
+        if provider == 'free':
+            try:
+                query, i_tokens, o_tokens = req_call(nl_query, schema, query_type)
+                console.print("[bold green]Generated Query:[/bold green]")
+                console.print(query)
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
+                console.print(f"[bold cyan]Tokens Used:[/bold cyan] Prompt: {i_tokens}, Completion: {o_tokens}, Total: {i_tokens+o_tokens}")
+            except Exception as e:
+                console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            if provider == 'lmstudio':
+                base_url = "http://localhost:1234/v1"
+            elif provider == 'ollama':
+                base_url = "http://localhost:11434/v1"
 
-            # Display the query without rich.Panel or rich.Syntax
-            console.print("[bold green]Generated Query:[/bold green]")
-            console.print(output)
+            llm = OpenAI(api_key=api_key, base_url=base_url, model=model)
+            console.print(f"[bold blue]Using {provider} with model {model} for conversion.[/bold blue]")
 
-            console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
-            if usage:
-                prompt_tokens = usage.get('prompt_tokens', 'N/A')
-                completion_tokens = usage.get('completion_tokens', 'N/A')
-                total_tokens = usage.get('total_tokens', 'N/A')
-                console.print(f"[bold cyan]Tokens Used:[/bold cyan] Prompt: {prompt_tokens}, Completion: {completion_tokens}, Total: {total_tokens}")
+            start_time = time.time()
+            try:
+                output, usage = llm.nl_to_query(nl_query, schema, query_type)
+                end_time = time.time()
+                elapsed_time = end_time - start_time
 
-        except Exception as e:
-            console.print(f"[bold red]An error occurred:[/bold red] {e}")
+                # Display the query without rich.Panel or rich.Syntax
+                console.print("[bold green]Generated Query:[/bold green]")
+                console.print(output)
+
+                console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
+                if usage:
+                    prompt_tokens = usage.get('prompt_tokens', 'N/A')
+                    completion_tokens = usage.get('completion_tokens', 'N/A')
+                    total_tokens = usage.get('total_tokens', 'N/A')
+                    console.print(f"[bold cyan]Tokens Used:[/bold cyan] Prompt: {prompt_tokens}, Completion: {completion_tokens}, Total: {total_tokens}")
+
+            except Exception as e:
+                console.print(f"[bold red]An error occurred:[/bold red] {e}")
     else:
         console.print("[yellow]Please set the query type first using the 'query-type' command.[/yellow]")
 
