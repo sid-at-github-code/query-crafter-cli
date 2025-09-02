@@ -1,7 +1,6 @@
 import click
 import time
 from rich.console import Console
-# Removed Panel and Syntax imports
 from rich.text import Text
 
 from .config import get_config, set_config, flush_config, load_config
@@ -13,9 +12,9 @@ console = Console()
 
 @click.group()
 def cli():
-    """A command-line tool to convert natural language queries to SQL.
+    """A command-line tool to convert natural language queries to SQL or any database format in a go.
 
-    This tool can use either a cloud-based service or a local Ollama instance
+    This tool can use either a cloud-based service( free and paid ) or a local Ollama instance
     for the conversion. The tool uses a configuration file to store the
     database schema and other settings.
     """
@@ -26,7 +25,22 @@ def cli():
 @click.option('--paste', help="Provide schema by pasting it directly.")
 @click.option('--extract', type=click.Path(exists=True), help="Provide schema by extracting it from a file.")
 def method(paste, extract):
-    """Sets the database schema to be used for the conversion."""
+    """Sets the database schema to be used for the conversion.
+
+    Example:
+
+      nl2sql method --extract "schema.txt" \n Simply provide schema file in any format
+
+      or
+
+      nl2sql method --paste "CREATE TABLE products (
+        product_id INT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        price DECIMAL(10, 2) NOT NULL,
+        category VARCHAR(50)
+      )" \n Simply paste the schema
+    """
     if paste:
         flush_config()
         console.print("[green]Schema provided via paste.[/green]")
@@ -44,7 +58,12 @@ def method(paste, extract):
 @cli.command(name="query-type")
 @click.argument("query_type")
 def query_type(query_type):
-    """Sets the type of query to be generated (e.g., sqlite, mysql, etc.)."""
+    """Sets the type of query to be generated (e.g., sqlite, mysql, etc.).
+    
+    simply write comamnd ->
+    
+    nl2sql query-type "mongo db" (or) 
+    nl2sql query-type "PostgreSQL" """
     if get_config("SCHEMA"):
         set_config("TYPE", query_type)
         console.print(f"[green]Query type set to: {query_type}[/green]")
@@ -58,7 +77,11 @@ def query_type(query_type):
 @click.option('--api-key', help='The API key for the LLM provider.')
 @click.option('--model', help='The model to use for conversion.')
 def convert(nl_query, provider, model, api_key):
-    """Converts a natural language query to SQL."""
+    """Converts a natural language query to SQL.
+    exmaple :
+    nl2sql convert "fetech all the orders below 1000$" --provider free 
+    or
+    nl2sql convert "find costomers who created account on 31 jan" --provider "openai" --api-key "<your key>" --model "gpt-4o-mini" """
     if get_config("TYPE"):
         schema = get_config("SCHEMA")
         query_type = get_config("TYPE")
@@ -75,6 +98,7 @@ def convert(nl_query, provider, model, api_key):
                 query, i_tokens, o_tokens = req_call(nl_query, schema, query_type)
                 console.print("[bold green]Generated Query:[/bold green]")
                 console.print(query)
+                pyperclip.copy(query)
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
@@ -99,6 +123,7 @@ def convert(nl_query, provider, model, api_key):
                 # Display the query without rich.Panel or rich.Syntax
                 console.print("[bold green]Generated Query:[/bold green]")
                 console.print(output)
+                pyperclip.copy(output)
 
                 console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
                 if usage:
@@ -136,6 +161,9 @@ def config_set(key, value):
 
     KEY: The configuration key (e.g., DEFAULT_PROVIDER, DEFAULT_MODEL, API_KEY).
     VALUE: The value to set for the key.
+    \n
+    ALL TYPES OF CONFIG TO SET ARE:
+    
     """
     set_config(key.upper(), value)
     console.print(f"[green]Configuration key '{key.upper()}' set to '{value}'.[/green]")
@@ -166,5 +194,11 @@ def config_list():
     else:
         console.print("[yellow]No configuration settings found.[/yellow]")
 
+@config.command(name='flush')
+def flushing():
+    """Total flush of all config set so far \n
+    nl2sql config flush """
+    flush_config()
+    console.print("[yellow]ALL CONFIGRATIONS DELETED.[/yellow]")
 
 cli.add_command(config)
