@@ -3,8 +3,8 @@ import time
 from rich.console import Console
 from rich.text import Text
 
-from .config import get_config, set_config, flush_config, load_config
-from .llm import OpenAI , req_call
+from .config import get_config,set_config, flush_config, load_config
+from .llm import OpenAI , req_call , retry_req_call
 import pyperclip
 
 console = Console()
@@ -90,15 +90,17 @@ def convert(nl_query, provider, model, api_key):
         provider = provider or get_config("DEFAULT_PROVIDER", "openai")
         model = model or get_config("DEFAULT_MODEL", "gpt-3.5-turbo")
         api_key = api_key or get_config("API_KEY", "")
-
+        set_config("REC_Q",nl_query)
         base_url = None
         start_time = time.time()
         if provider == 'free':
+            console.print(f"[bold blue]Using free model for conversion.(please make sure you have stable internet connection . . . )[/bold blue]")
             try:
                 query, i_tokens, o_tokens = req_call(nl_query, schema, query_type)
                 console.print("[bold green]Generated Query:[/bold green]")
                 console.print(query)
                 pyperclip.copy(query)
+                set_config("REC_OUTPUT",query)
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
@@ -124,7 +126,7 @@ def convert(nl_query, provider, model, api_key):
                 console.print("[bold green]Generated Query:[/bold green]")
                 console.print(output)
                 pyperclip.copy(output)
-
+                set_config("REC_OUTPUT",output)
                 console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
                 if usage:
                     prompt_tokens = usage.get('prompt_tokens', 'N/A')
@@ -139,13 +141,77 @@ def convert(nl_query, provider, model, api_key):
 
 
 @cli.command()
-@click.argument("reason", required=False)
-def retry(reason):
-    if reason:
-        console.print(f"[blue]Retrying with correction:[/blue] {reason}")
+@click.argument("reason", required=False) 
+@click.option('--provider', type=click.Choice(['openai', 'lmstudio', 'ollama','free']), help='The LLM provider to use.')
+@click.option('--api-key', help='The API key for the LLM provider.')
+@click.option('--model', help='The model to use for conversion.')
+def retry(reason, provider, model, api_key):
+    """
+    use this method if you are not satisfied with your previous output :
+    example-
+    \n
+    nl2sql retry "incorrect fetching" --provider ollama --model gemma3
+    """
+    if get_config("REC_OUTPUT"):
+        rec_q=get_config("REC_Q")
+        rec_o=get_config("REC_OUTPUT")
+           
+        schema = get_config("SCHEMA")
+        query_type = get_config("TYPE")
+
+        # Get defaults from config if not provided as arguments
+        provider = provider or get_config("DEFAULT_PROVIDER", "openai")
+        model = model or get_config("DEFAULT_MODEL", "gpt-3.5-turbo")
+        api_key = api_key or get_config("API_KEY", "")
+        base_url = None
+        start_time = time.time()
+        if provider == 'free':
+            try:
+                console.print(f"[bold blue]Using free model for conversion.(please make sure you have stable internet connection . . . )[/bold blue]")
+                query, i_tokens, o_tokens = retry_req_call(rec_q, rec_o , schema, query_type , reason)
+                console.print("[bold green]Generated Query:[/bold green]")
+                console.print(query)
+                pyperclip.copy(query)
+                set_config("REC_OUTPUT",query)
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
+                console.print(f"[bold cyan]Tokens Used:[/bold cyan] Prompt: {i_tokens}, Completion: {o_tokens}, Total: {i_tokens+o_tokens}")
+            except Exception as e:
+                console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            if provider == 'lmstudio':
+                base_url = "http://localhost:1234/v1"
+            elif provider == 'ollama':
+                base_url = "http://localhost:11434/v1"
+
+            llm = OpenAI(api_key=api_key, base_url=base_url, model=model)
+            console.print(f"[bold blue]Using {provider} with model {model} for conversion.[/bold blue]")
+
+            start_time = time.time()
+            try:
+                output, usage = llm.retrying(schema, query_type,rec_q,rec_o,reason)
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+
+                # Display the query without rich.Panel or rich.Syntax
+                console.print("[bold green]Generated Query:[/bold green]")
+                console.print(output)
+                pyperclip.copy(output)
+                set_config("REC_OUTPUT",output)
+                console.print(f"[bold cyan]Time taken:[/bold cyan] {elapsed_time:.2f} seconds")
+                if usage:
+                    prompt_tokens = usage.get('prompt_tokens', 'N/A')
+                    completion_tokens = usage.get('completion_tokens', 'N/A')
+                    total_tokens = usage.get('total_tokens', 'N/A')
+                    console.print(f"[bold cyan]Tokens Used:[/bold cyan] Prompt: {prompt_tokens}, Completion: {completion_tokens}, Total: {total_tokens}")
+
+            except Exception as e:
+                console.print(f"[bold red]An error occurred:[/bold red] {e}")
     else:
-        console.print("[blue]Retrying...[/blue]")
-    console.print("[yellow]Retry functionality is not fully implemented yet.[/yellow]")
+        console.print("[yellow]Please set the query type first using the 'query-type' command.[/yellow]")
+    
+
 
 
 @cli.group()
