@@ -7,8 +7,114 @@ from .config import get_config,set_config, flush_config, load_config
 from .llm import OpenAI , req_call , retry_req_call ,req_explain
 import pyperclip
 
+from .tutorial_system import NL2SQLTutorial
+
+tutorial_system = NL2SQLTutorial(package_name="qcraft")
+
 console = Console()
 
+@click.group()
+def tutorial():
+    """Interactive tutorial and help system for query-crafter-cli
+    
+    Learn how to use qcraft with interactive guides and examples.
+    Perfect for beginners and advanced users alike!
+    
+    Available tutorial modes:
+    - complete: Full interactive tutorial experience
+    - quick: Quick start guide (2 minutes)  
+    - commands: Detailed command reference
+    - workflow: Step-by-step example workflow
+    - config: Configuration management guide
+    - tips: Pro tips and best practices
+    """
+    pass
+
+@tutorial.command()
+def complete():
+    """Run the complete interactive tutorial
+    
+    🚀 Full guided experience with:
+    - Welcome screen with ASCII art
+    - Tool overview and workflow explanation
+    - Detailed command reference  
+    - Step-by-step examples
+    - Configuration guide
+    - Tips and best practices
+    
+    Perfect for new users!
+    """
+    tutorial_system.run_complete_tutorial()
+
+@tutorial.command()
+def quick():
+    """Quick start guide - essential commands only
+    
+    ⚡ Get started in 2 minutes with:
+    - Essential commands overview
+    - Quick setup steps
+    - Basic usage examples
+    
+    Perfect when you need to get up and running fast!
+    """
+    tutorial_system.run_quick_tutorial()
+
+@tutorial.command()
+def commands():
+    """Detailed command reference
+    
+    📖 Comprehensive guide covering:
+    - Schema management (method --paste/--extract)
+    - Query type configuration  
+    - Natural language conversion
+    - Query assistance (retry/explain)
+    - Configuration management
+    
+    Your complete command manual!
+    """
+    tutorial_system.show_commands_guide()
+
+@tutorial.command()
+def workflow():
+    """Step-by-step workflow example
+    
+    🎯 Real-world example showing:
+    - Setting up database schema
+    - Configuring query type
+    - Converting natural language
+    - Refining results
+    
+    See qcraft in action!
+    """
+    tutorial_system.show_workflow_example()
+
+@tutorial.command()
+def config():
+    """Configuration management guide
+    
+    ⚙️ Learn about:
+    - All configuration keys
+    - Setting default values
+    - Managing API keys
+    - Configuration best practices
+    
+    Master your qcraft setup!
+    """
+    tutorial_system.show_configuration_guide()
+
+@tutorial.command()  
+def tips():
+    """Tips and best practices
+    
+    💡 Pro tips for:
+    - Writing better queries
+    - Choosing AI providers
+    - Advanced usage patterns
+    - Troubleshooting common issues
+    
+    Level up your qcraft skills!
+    """
+    tutorial_system.show_tips_and_tricks()
 
 @click.group()
 def cli():
@@ -20,7 +126,8 @@ def cli():
     """
     pass
 
-
+    
+    
 @cli.command()
 @click.option('--paste', help="Provide schema by pasting it directly.")
 @click.option('--extract', type=click.Path(exists=True), help="Provide schema by extracting it from a file.")
@@ -29,11 +136,11 @@ def method(paste, extract):
 
     Example:
 
-      nl2sql method --extract "schema.txt" \n Simply provide schema file in any format
+      qcraft method --extract "schema.txt" \n Simply provide schema file in any format
 
       or
 
-      nl2sql method --paste "CREATE TABLE products (
+      qcraft method --paste "CREATE TABLE products (
         product_id INT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         description TEXT,
@@ -62,8 +169,8 @@ def query_type(query_type):
     
     simply write comamnd ->
     
-    nl2sql query-type "mongo db" (or) 
-    nl2sql query-type "PostgreSQL" """
+    qcraft query-type "mongo db" (or) 
+    qcraft query-type "PostgreSQL" """
     if get_config("SCHEMA"):
         set_config("TYPE", query_type)
         console.print(f"[green]Query type set to: {query_type}[/green]")
@@ -79,9 +186,9 @@ def query_type(query_type):
 def convert(nl_query, provider, model, api_key):
     """Converts a natural language query to SQL.
     exmaple :\n
-    nl2sql convert "fetech all the orders below 1000$" --provider free 
+    qcraft convert "fetech all the orders below 1000$" --provider free 
     \n
-    nl2sql convert "find costomers who created account on 31 jan" --provider "openai" --api-key "<your key>" --model "gpt-4o-mini" """
+    qcraft convert "find costomers who created account on 31 jan" --provider "openai" --api-key "<your key>" --model "gpt-4o-mini" """
     if get_config("TYPE"):
         schema = get_config("SCHEMA")
         query_type = get_config("TYPE")
@@ -151,9 +258,9 @@ def assist(action,reason, provider, model, api_key):
     use this method if you are not satisfied with your previous output 
     example-
     \n
-    nl2sql assist retry "incorrect fetching" --provider ollama --model gemma3
+    qcraft assist retry "incorrect fetching" --provider ollama --model gemma3
     \n
-    nl2sql assist explain --provider openai --model gpt-4o-mini 
+    qcraft assist explain --provider openai --model gpt-4o-mini 
     """
     if get_config("REC_OUTPUT"):
         rec_q=get_config("REC_Q")
@@ -281,7 +388,7 @@ def config_set(key, value):
     4) DEFAULT_MODEL
     5) API_KEY
     \n
-    SIMPLE EXAMPLE -> nl2sql config set TYPE "mongo db"
+    SIMPLE EXAMPLE -> qcraft config set TYPE "mongo db"
     
     """
     set_config(key.upper(), value)
@@ -293,7 +400,7 @@ def config_set(key, value):
 def config_get(key):
     """Get the value of a configuration key.
     Insatant lookup on the specific config.example 
-    nl2sql config get SCHEMA 
+    qcraft config get SCHEMA 
     
     """
     value = get_config(key.upper())
@@ -306,7 +413,7 @@ def config_get(key):
 @config.command(name="list")
 def config_list():
     """List all configuration settings. \n
-    nl2sql config list """
+    qcraft config list """
     all_config = load_config()
     if all_config:
         console.print("[bold underline]Current Configuration:[/bold underline]")
@@ -318,8 +425,9 @@ def config_list():
 @config.command(name='flush')
 def flushing():
     """Total flush of all config set so far \n
-    nl2sql config flush """
+    qcraft config flush """
     flush_config()
     console.print("[yellow]ALL CONFIGRATIONS DELETED.[/yellow]")
 
 cli.add_command(config)
+cli.add_command(tutorial)
