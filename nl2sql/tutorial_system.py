@@ -25,26 +25,13 @@ class NL2SQLTutorial:
         
         # ASCII Art Title
         title_art = """
- ██████╗ ██╗   ██╗███████╗██████╗ ██╗   ██╗
-██╔═══██╗██║   ██║██╔════╝██╔══██╗╚██╗ ██╔╝
-██║   ██║██║   ██║█████╗  ██████╔╝ ╚████╔╝ 
-██║▄▄ ██║██║   ██║██╔══╝  ██╔══██╗  ╚██╔╝  
-╚██████╔╝╚██████╔╝███████╗██║  ██║   ██║   
- ╚══▀▀═╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   
+ ██████╗ ██╗   ██╗███████╗██████╗ ██╗   ██╗      ██████╗██████╗  █████╗ ███████╗████████╗███████╗██████╗       ██████╗██╗     ██╗
+██╔═══██╗██║   ██║██╔════╝██╔══██╗╚██╗ ██╔╝     ██╔════╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗     ██╔════╝██║     ██║
+██║   ██║██║   ██║█████╗  ██████╔╝ ╚████╔╝      ██║     ██████╔╝███████║█████╗     ██║   █████╗  ██████╔╝     ██║     ██║     ██║
+██║▄▄ ██║██║   ██║██╔══╝  ██╔══██╗  ╚██╔╝       ██║     ██╔══██╗██╔══██║██╔══╝     ██║   ██╔══╝  ██╔══██╗     ██║     ██║     ██║
+╚██████╔╝╚██████╔╝███████╗██║  ██║   ██║        ╚██████╗██║  ██║██║  ██║██║        ██║   ███████╗██║  ██║     ╚██████╗███████╗██║
+ ╚══▀▀═╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝         ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚══════╝╚═╝  ╚═╝      ╚═════╝╚══════╝╚═╝
 
- ██████╗██████╗  █████╗ ███████╗████████╗███████╗██████╗ 
-██╔════╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗
-██║     ██████╔╝███████║█████╗     ██║   █████╗  ██████╔╝
-██║     ██╔══██╗██╔══██║██╔══╝     ██║   ██╔══╝  ██╔══██╗
-╚██████╗██║  ██║██║  ██║██║        ██║   ███████╗██║  ██║
- ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚══════╝╚═╝  ╚═╝
-
- ██████╗██╗     ██╗
-██╔════╝██║     ██║
-██║     ██║     ██║
-██║     ██║     ██║
-╚██████╗███████╗██║
- ╚═════╝╚══════╝╚═╝
 """
 
         
@@ -56,73 +43,52 @@ class NL2SQLTutorial:
             padding=(1, 2)
         ))
         
-        # Introduction
-        intro_text = f"""
-        **NL2SQL** is a powerful command-line tool that transforms your natural language queries 
-        into SQL or database queries using advanced AI models. Whether you're a beginner or 
-        an expert, this tool makes database querying as simple as speaking your mind!
-        
-        ✨ **Key Features:**
-        • Support for multiple database types (MySQL, PostgreSQL, MongoDB, SQLite, etc.)
-        • Multiple AI providers (OpenAI, Ollama, LMStudio, Free tier)
-        • Schema extraction from files
-        • Query explanation and retry functionality
-        • Automatic clipboard copying
-        
-        📦 **Package:** `{self.package_name}`
-        """
-        
-        self.console.print(Panel(
-            Markdown(intro_text),
-            title="📚 About QUERY-CRAFTER-CLI",
-            border_style="green",
-            padding=(1, 2)
-        ))
+
         
         if Confirm.ask("Ready to start the tutorial?", default=True):
             self.console.print("\n" + "="*60 + "\n")
     
     def show_overview(self):
-        """Show tool overview and workflow"""
-        self.console.print(Rule("🔄 How QCraft Works", style="bold magenta"))
+            """Show tool overview and workflow"""
+            self.console.print(Rule("🔄 How QCraft Works", style="bold magenta"))
+            
+            # Create workflow tree
+            workflow_tree = Tree("🚀 QCraft Workflow", style="bold blue")
+            
+            step1 = workflow_tree.add("1️⃣ [bold green]Set Database Schema[/bold green]")
+            step1.add("📝 Paste schema directly or extract from file")
+            step1.add("🎯 Example: CREATE TABLE users (id INT, name VARCHAR...)")
+            
+            step2 = workflow_tree.add("2️⃣ [bold yellow]Configure Query Type[/bold yellow]")
+            step2.add("🔧 Specify database type (MySQL, PostgreSQL, MongoDB...)")
+            step2.add("🎯 Example: PostgreSQL, SQLite, etc.")
+            
+            step3 = workflow_tree.add("3️⃣ [bold cyan]Convert Natural Language[/bold cyan]")
+            step3.add("🗣️ Write your query in plain English")
+            step3.add("🤖 AI converts it to proper database query")
+            step3.add("📋 Result automatically copied to clipboard")
+            
+            step4 = workflow_tree.add("4️⃣ [bold red]Refine & Explain[/bold red]")
+            step4.add("🔄 Retry with specific improvements")
+            step4.add("💡 Get detailed explanations")
+            
+            self.console.print(Panel(workflow_tree, title="🔄 Workflow Overview", border_style="magenta"))
+            
+            # Provider comparison table
+            provider_table = Table(title="🤖 AI Provider Options", show_header=True, header_style="bold blue")
+            provider_table.add_column("Provider", style="cyan", width=12)
+            provider_table.add_column("Cost", style="green", width=10)
+            provider_table.add_column("Setup", style="yellow", width=15)
+            provider_table.add_column("Models", style="magenta", width=20)
+            
+            provider_table.add_row("Free", "Free", "No setup needed", "Built-in model")
+            provider_table.add_row("OpenAI", "Paid", "API key required", "GPT-4, GPT-3.5-turbo")
+            provider_table.add_row("Ollama", "Free", "Local installation", "Llama2, Mistral, etc.")
+            provider_table.add_row("LMStudio", "Free", "Local installation", "Various local models")
+            
+            self.console.print(provider_table)
+            self.console.print("\n")
         
-        # Create workflow tree
-        workflow_tree = Tree("🚀 QCraft Workflow", style="bold blue")
-        
-        step1 = workflow_tree.add("1️⃣ [bold green]Set Database Schema[/bold green]")
-        step1.add("📝 Paste schema directly or extract from file")
-        step1.add("🎯 Example: CREATE TABLE users (id INT, name VARCHAR...)")
-        
-        step2 = workflow_tree.add("2️⃣ [bold yellow]Configure Query Type[/bold yellow]")
-        step2.add("🔧 Specify database type (MySQL, PostgreSQL, MongoDB...)")
-        step2.add("🎯 Example: PostgreSQL, SQLite, etc.")
-        
-        step3 = workflow_tree.add("3️⃣ [bold cyan]Convert Natural Language[/bold cyan]")
-        step3.add("🗣️ Write your query in plain English")
-        step3.add("🤖 AI converts it to proper database query")
-        step3.add("📋 Result automatically copied to clipboard")
-        
-        step4 = workflow_tree.add("4️⃣ [bold red]Refine & Explain[/bold red]")
-        step4.add("🔄 Retry with specific improvements")
-        step4.add("💡 Get detailed explanations")
-        
-        self.console.print(Panel(workflow_tree, title="🔄 Workflow Overview", border_style="magenta"))
-        
-        # Provider comparison table
-        provider_table = Table(title="🤖 AI Provider Options", show_header=True, header_style="bold blue")
-        provider_table.add_column("Provider", style="cyan", width=12)
-        provider_table.add_column("Cost", style="green", width=10)
-        provider_table.add_column("Setup", style="yellow", width=15)
-        provider_table.add_column("Models", style="magenta", width=20)
-        
-        provider_table.add_row("Free", "Free", "No setup needed", "Built-in model")
-        provider_table.add_row("OpenAI", "Paid", "API key required", "GPT-4, GPT-3.5-turbo")
-        provider_table.add_row("Ollama", "Free", "Local installation", "Llama2, Mistral, etc.")
-        provider_table.add_row("LMStudio", "Free", "Local installation", "Various local models")
-        
-        self.console.print(provider_table)
-        self.console.print("\n")
-    
     def show_quick_start(self):
         """Show quick start guide"""
         self.console.print(Rule("⚡ Quick Start Guide", style="bold green"))
@@ -234,7 +200,7 @@ class NL2SQLTutorial:
         if options:
             content += "**Options:**\n"
             for opt, desc, example in options:
-                content += f"• `{opt}`: {desc}\n"
+                content += f"- `{opt}`: {desc}\n"
                 if example:
                     content += f"  Example: `{example}`\n"
             content += "\n"
@@ -291,6 +257,13 @@ class NL2SQLTutorial:
                 "description": "Define your database structure"
             },
             {
+                "title": "1️⃣ Setting Up Schema",
+                "command": f"{self.package_name} method --extract 'schema.txt' ",
+                "example": """place our schema in a file and then extract it form there """,
+                "description": "Define your database structure"
+            },
+            
+            {
                 "title": "2️⃣ Configure Database Type", 
                 "command": f"{self.package_name} query-type PostgreSQL",
                 "example": "",
@@ -313,7 +286,10 @@ class NL2SQLTutorial:
         for step in example_steps:
             step_content = f"**Command:** `{step['command']}`\n\n"
             if step['example']:
-                step_content += f"**Example:**\n```\n{step['example']}\n```\n\n"
+                if step['command'] == f"{self.package_name} method --paste":
+                    step_content += f"**Schema:**\n```sql\n{step['example']}\n```\n\n"
+                else:
+                    step_content += f"**Example:**\n```bash\n{step['command']} {step['example']}\n```\n\n"
             step_content += f"*{step['description']}*"
             
             self.console.print(Panel(
@@ -328,31 +304,31 @@ class NL2SQLTutorial:
         self.console.print(Rule("⚙️ Configuration Management", style="bold yellow"))
         
         config_info = f"""
-        ## Configuration Keys
-        
-        | Key | Description | Example |
-        |-----|-------------|---------|
-        | SCHEMA | Database schema definition | CREATE TABLE... |
-        | TYPE | Target database type | PostgreSQL, MySQL |
-        | DEFAULT_PROVIDER | Preferred AI provider | openai, free |
-        | DEFAULT_MODEL | Default model to use | gpt-4o-mini |
-        | API_KEY | API key for providers | sk-... |
-        
-        ## Useful Commands
-        
-        ```bash
-        # Set default provider
-        {self.package_name} config set DEFAULT_PROVIDER openai
-        
-        # View current schema  
-        {self.package_name} config get SCHEMA
-        
-        # List all settings
-        {self.package_name} config list
-        
-        # Clear everything
-        {self.package_name} config flush
-        ```
+## Configuration Keys
+
+| Key | Description | Example |
+|-----|-------------|---------|
+| `SCHEMA` | Database schema definition | `CREATE TABLE users (id INT, name VARCHAR(50)...)` |
+| `TYPE` | Target database type | `PostgreSQL`, `MySQL`, `SQLite` |
+| `DEFAULT_PROVIDER` | Preferred AI provider | `openai`, `anthropic`, `free` |
+| `DEFAULT_MODEL` | Default model to use | `gpt-4o-mini`, `claude-3-haiku` |
+| `API_KEY` | API key for providers | `sk-...` (OpenAI), `sk-ant-...` (Anthropic) |
+
+## Useful Commands
+
+```bash
+# Set default provider
+{self.package_name} config set DEFAULT_PROVIDER openai
+
+# View current schema  
+{self.package_name} config get SCHEMA
+
+# List all settings
+{self.package_name} config list
+
+# Clear everything
+{self.package_name} config flush
+```
         """
         
         self.console.print(Panel(Markdown(config_info), title="⚙️ Configuration Guide", border_style="yellow"))
@@ -364,27 +340,30 @@ class NL2SQLTutorial:
         tips_columns = [
             Panel(
                 Markdown("""
-                ### 🎯 Writing Better Queries
-                • Be specific about what you want
-                • Mention table names when possible  
-                • Include filtering criteria clearly
-                • Specify sorting requirements
-                
-                **Good:** "Get customers who ordered in January, sorted by name"
-                **Bad:** "Get some data"
+### 🎯 Writing Better Queries
+
+- Be specific about what you want
+- Mention table names when possible  
+- Include filtering criteria clearly
+- Specify sorting requirements
+
+**Good:** "Get customers who ordered in January, sorted by name"
+
+**Bad:** "Get some data"
                 """),
                 title="Query Writing",
                 border_style="green"
             ),
             Panel(
                 Markdown("""
-                ### 🚀 Provider Selection
-                • **Free**: Quick testing, no setup
-                • **OpenAI**: Best quality, requires API key
-                • **Ollama**: Local, private, free
-                • **LMStudio**: Local GUI, easy setup
-                
-                Start with **free** for testing!
+### 🚀 Provider Selection
+
+- **Free**: Quick testing, no setup
+- **OpenAI**: Best quality, requires API key
+- **Ollama**: Local, private, free
+- **LMStudio**: Local GUI, easy setup
+
+Start with **free** for testing!
                 """),
                 title="Provider Choice", 
                 border_style="blue"
@@ -395,18 +374,19 @@ class NL2SQLTutorial:
         
         # Advanced tips
         advanced_tips = """
-        ### 🔧 Pro Tips
-        
-        1. **Schema Management**: Keep your schema files organized and version controlled
-        2. **Query Refinement**: Use the `assist retry` command with specific feedback
-        3. **Clipboard Integration**: Generated queries are auto-copied - just paste and run!
-        4. **Error Handling**: If a query fails, use `assist explain` to understand why
-        5. **Model Selection**: Larger models (GPT-4) give better results for complex queries
-        
-        ### ⚡ Keyboard Shortcuts
-        - Ctrl+C: Stop current operation
-        - Up Arrow: Recall previous command (in most terminals)
-        - Ctrl+V: Paste generated query (auto-copied!)
+### 🔧 Pro Tips
+
+1. **Schema Management**: Keep your schema files organized and version controlled
+2. **Query Refinement**: Use the `assist retry` command with specific feedback
+3. **Clipboard Integration**: Generated queries are auto-copied - just paste and run!
+4. **Error Handling**: If a query fails, use `assist explain` to understand why
+5. **Model Selection**: Larger models (GPT-4) give better results for complex queries
+
+### ⚡ Keyboard Shortcuts
+
+- Ctrl+C: Stop current operation
+- Up Arrow: Recall previous command (in most terminals)
+- Ctrl+V: Paste generated query (auto-copied!)
         """
         
         self.console.print(Panel(Markdown(advanced_tips), title="🎓 Advanced Usage", border_style="magenta"))
@@ -416,29 +396,32 @@ class NL2SQLTutorial:
         self.console.print(Rule("🎉 You're Ready to Go!", style="bold green"))
         
         conclusion_text = f"""
-        ## 🚀 What's Next?
-        
-        You now have everything you need to start converting natural language to SQL like a pro!
-        
-        ### Quick Reference
-        ```bash
-        # Essential workflow
-        {self.package_name} method --paste "YOUR_SCHEMA"
-        {self.package_name} query-type "DATABASE_TYPE" 
-        {self.package_name} convert "your natural language query" --provider free
-        ```
-        
-        ### 📚 Additional Resources
-        - Run `{self.package_name} tutorial commands` for detailed command reference
-        - Use `{self.package_name} config list` to check your current setup
-        - Try `{self.package_name} assist explain` to understand generated queries
-        
-        ### 🤝 Need Help?
-        - Check your schema is properly set if conversions fail
-        - Try different providers if you get errors
-        - Use the `assist retry` command to refine results
-        
-        **Happy Querying! 🎯**
+## 🚀 What's Next?
+
+You now have everything you need to start converting natural language to SQL like a pro!
+
+### Quick Reference
+
+```bash
+# Essential workflow
+{self.package_name} method --paste "YOUR_SCHEMA"
+{self.package_name} query-type "DATABASE_TYPE" 
+{self.package_name} convert "your natural language query" --provider free
+```
+
+### 📚 Additional Resources
+
+- Run `{self.package_name} tutorial commands` for detailed command reference
+- Use `{self.package_name} config list` to check your current setup
+- Try `{self.package_name} assist explain` to understand generated queries
+
+### 🤝 Need Help?
+
+- Check your schema is properly set if conversions fail
+- Try different providers if you get errors
+- Use the `assist retry` command to refine results
+
+**Happy Querying! 🎯**
         """
         
         self.console.print(Panel(
@@ -469,61 +452,6 @@ class NL2SQLTutorial:
         self.show_quick_start()
 
 
-# =============================================================================
-# WHAT TO ADD TO YOUR MAIN CLI FILE
-# =============================================================================
-
-# Add these imports to your main CLI file (where you have @cli.group()):
-# from .tutorial_system import NL2SQLTutorial
-
-# Then replace your existing tutorial group with this:
-
-"""
-# ADD THIS TO YOUR MAIN CLI FILE:
-
-from .tutorial_system import NL2SQLTutorial
-
-# Initialize tutorial system
-tutorial_system = NL2SQLTutorial(package_name="nl2sql-cli")
-
-@click.group()
-def tutorial():
-    \"\"\"Interactive tutorial and help system for nl2sql-cli\"\"\"
-    pass
-
-@tutorial.command()
-def complete():
-    \"\"\"Run the complete interactive tutorial\"\"\"
-    tutorial_system.run_complete_tutorial()
-
-@tutorial.command()
-def quick():
-    \"\"\"Quick start guide - essential commands only\"\"\"
-    tutorial_system.run_quick_tutorial()
-
-@tutorial.command()
-def commands():
-    \"\"\"Detailed command reference\"\"\"
-    tutorial_system.show_commands_guide()
-
-@tutorial.command()
-def workflow():
-    \"\"\"Step-by-step workflow example\"\"\"
-    tutorial_system.show_workflow_example()
-
-@tutorial.command()
-def config():
-    \"\"\"Configuration management guide\"\"\"
-    tutorial_system.show_configuration_guide()
-
-@tutorial.command()
-def tips():
-    \"\"\"Tips and best practices\"\"\"
-    tutorial_system.show_tips_and_tricks()
-
-# Don't forget to add the tutorial group to your main CLI
-cli.add_command(tutorial)
-"""
 
 # =============================================================================
 # USAGE EXAMPLES
