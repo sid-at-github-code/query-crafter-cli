@@ -1,0 +1,2 @@
+[console_scripts]
+qcraft = nl2sql.cli:cli

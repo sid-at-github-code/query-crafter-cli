@@ -431,3 +431,6 @@ def flushing():
 
 cli.add_command(config)
 cli.add_command(tutorial)
+
+if __name__ == "__main__":
+    cli()
