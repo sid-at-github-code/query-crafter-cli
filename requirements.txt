@@ -1,4 +1,5 @@
-click
 requests
 openai
+click
 rich
+pyperclip
