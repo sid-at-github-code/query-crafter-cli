@@ -40,6 +40,13 @@ graph LR
 ## 🎬 See QCraft in Action
 
 ```bash
+
+# get your schema form databse, as schema.sql or just put any king of schem in a file like main_scehma01.txt
+# somple use this file to share sceham to the cli tool
+
+$ qcraft method --extract "main_schema01.txt"
+
+
 # Set your database schema
 $ qcraft method --paste "CREATE TABLE orders (id INT, customer_name VARCHAR(100), amount DECIMAL(10,2), order_date DATE)"
 
@@ -71,6 +78,8 @@ npm install -g qcraft-cli
 ```bash
 # 1. Set your database schema
 qcraft method --paste "YOUR_DATABASE_SCHEMA"
+# or if schema file availabel just auto extract it
+$ qcraft method --extract "main_schema01.txt"
 
 # 2. Choose your database type
 qcraft query-type "PostgreSQL"
